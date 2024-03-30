@@ -14,7 +14,7 @@ app.use(templeteRoutes);
 
 
 sequelize
-  .sync({ force: false })
+  .sync({ force: true })
   .then(() => {
     console.log("Server is connected");
     app.listen(4000);
