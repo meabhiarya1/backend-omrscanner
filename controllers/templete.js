@@ -1,53 +1,26 @@
 const Templete = require("../models/templete");
-const Sequelize = require("sequelize");
-const sequelize = require("../util/database");
+const MetaData = require("../models/metadata");
 
 exports.addTemplete = async (req, res, next) => {
-  const { templeteName, columnData } = req.body;
+  const { templeteData, metaData } = req.body;
   try {
-    // const values = [name, rollno, school, subject];
-    // const numValues = values.filter(Boolean).length;
-    const dynamicModel = sequelize.define(
-      templeteName,
-      {
-        id: {
-          type: Sequelize.INTEGER,
-          autoIncrement: true,
-          allowNull: false,
-          primaryKey: true,
-        },
-      },
-      { timestamps: false }
-    );
+    const result = await Templete.create({
+      name: templeteData.name,
+    });
 
-    // Synchronize the model definition with the database to create the table
-    await dynamicModel.sync();
+    await MetaData.create({
+      attribute: metaData.attribute,
+      coordinateX: metaData.coordinateX,
+      coordinateY: metaData.coordinateY,
+      width: metaData.width,
+      height: metaData.height,
+      templeteId: result.id,
+    });
 
-    res
-      .status(200)
-      .json({ message: `Table ${tableName} created successfully` });
-
-    // const columnNames = [];
-    // for (let i = 0; i < numValues; i++) {
-    //   const columnName = values[i];
-    //   columnNames.push(columnName);
-    //   await sequelize.query(
-    //     `ALTER TABLE templetes ADD COLUMN ${columnName} VARCHAR(255);`
-    //   );
-    // }
-
-    // console.log("here it is>>>>>>>>>>>>", columnNames);
-
-    // const templeteData = {};
-    // for (let i = 0; i < numValues; i++) {
-    //   const columnName = `value_${i + 1}`;
-    //   templeteData[columnName] = values[i];
-    // }
-
-    // const templete = await Templete.create(templeteData);
-    // res.status(200).json(templete);
+    res.status(200).json({ message: "Created Successfully" });
   } catch (error) {
-    console.log(error);
+    console.error("Error:", error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 

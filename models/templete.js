@@ -9,6 +9,10 @@ const Templete = sequelize.define("templetes", {
     allowNull: false,
     primaryKey: true,
   },
+  name: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = Templete;
