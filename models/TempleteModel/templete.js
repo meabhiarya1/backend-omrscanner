@@ -13,6 +13,11 @@ const Templete = sequelize.define("templetes", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+
+  answerSheet: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = Templete;
