@@ -2,10 +2,11 @@ const Templete = require("../../models/TempleteModel/templete");
 const MetaData = require("../../models/TempleteModel/metadata");
 
 const addTemplete = async (req, res, next) => {
-  const { templeteData, metaData } = req.body;
+  const { templateData, metaData } = req.body;
+  // console.log(templateData)
   try {
     const templeteResult = await Templete.create({
-      name: templeteData.name,
+      name: templateData.name,
     });
 
     await metaData.forEach((current) => {
