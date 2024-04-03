@@ -9,6 +9,6 @@ const router = express.Router();
 router.get("/get/templetes", getTemplete);
 router.get("/get/templetedata/:id", getTempleteData);
 router.post("/add/templete", addTemplete);
-router.post("/upload", handleUpload);
+router.post("/upload/:id", handleUpload);
 
 module.exports = router;

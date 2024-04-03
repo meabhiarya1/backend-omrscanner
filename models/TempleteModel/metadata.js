@@ -31,6 +31,16 @@ const MetaData = sequelize.define("templetedata", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+
+  csvFile: {
+    type: Sequelize.STRING,
+    defaultValue: null,
+  },
+
+  zipFile: {
+    type: Sequelize.STRING,
+    defaultValue: null,
+  },
 });
 
 module.exports = MetaData;
