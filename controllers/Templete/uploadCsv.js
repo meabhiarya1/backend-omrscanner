@@ -1,10 +1,9 @@
 const multer = require("multer");
 const XLSX = require("xlsx");
-const { DATE } = require("sequelize");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "uploads/");
+    cb(null, "csvFile/");
   },
   filename: function (req, file, cb) {
     const timestamp = Date.now() / 1000;
