@@ -2,7 +2,7 @@ const express = require("express");
 const addTemplete = require("../controllers/Templete/addTemplete");
 const getTemplete = require("../controllers/Templete/getTemplete");
 const getTempleteData = require("../controllers/Templete/getTempleteData");
-const handleUpload = require("../controllers/Templete/zipFile");
+const handleUpload = require("../controllers/Templete/upload");
 
 const router = express.Router();
 
