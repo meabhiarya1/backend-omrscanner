@@ -5,7 +5,14 @@ const getTempleteData = async (req, res, next) => {
   try {
     const templeteId = req.params.id;
     const templete = await Templete.findByPk(templeteId, {
-      include: MetaData,
+      include: [
+        {
+          model: MetaData,
+          attributes: {
+            exclude: ["id", "templeteId", "createdAt", "updatedAt"], // Specify the fields to be excluded
+          },
+        },
+      ],
     });
 
     if (!templete) {

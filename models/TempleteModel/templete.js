@@ -14,10 +14,15 @@ const Templete = sequelize.define("templetes", {
     allowNull: false,
   },
 
-  answerSheet: {
-    type: Sequelize.STRING,
-    allowNull: false,
-  },
+  // answerSheet: {
+  //   type: Sequelize.STRING,
+  //   allowNull: false,
+  // },
+
+  // questionImage: {
+  //   type: Sequelize.STRING,
+  //   allowNull: false,
+  // },
 });
 
 module.exports = Templete;
