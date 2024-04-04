@@ -1,14 +1,15 @@
 const Templete = require("../../models/TempleteModel/templete");
 const MetaData = require("../../models/TempleteModel/metadata");
+const Files = require("../../models/TempleteModel/files");
 
 const addTemplete = async (req, res, next) => {
   const { templateData, metaData } = req.body;
-  // console.log(templateData)
+  console.log(templateData, metaData);
   try {
     const templeteResult = await Templete.create({
       name: templateData.name,
     });
-
+    // console.log(templeteResult);
     await metaData.forEach((current) => {
       MetaData.create({
         attribute: current.attribute,

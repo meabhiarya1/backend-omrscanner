@@ -1,6 +1,7 @@
 const multer = require("multer");
 const XLSX = require("xlsx");
 const MetaData = require("../../models/TempleteModel/metadata");
+const Files = require("../../models/TempleteModel/files");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -25,19 +26,18 @@ const upload = multer({ storage: storage }).fields([
   { name: "zipFile" },
 ]);
 
-const uploadPromise = (req, res, next, userId) => {
+const uploadPromise = (req, res, next, id) => {
+  console.log(id);
   return new Promise((resolve, reject) => {
-    console.log(userId)
+    // console.log(userId);
     upload(req, res, async function (err) {
       try {
         // Update database with file names
-        await MetaData.update(
-          {
-            csvFile: req.files.csvFile[0].filename,
-            zipFile: req.files.zipFile[0].filename,
-          },
-          { where: { id: userId } }
-        );
+        await Files.create({
+          csvFile: req.files.csvFile[0].filename,
+          zipFile: req.files.zipFile[0].filename,
+          templeteId: id,
+        });
         console.log("File Uploaded Successfully");
         resolve("File Uploaded Successfully");
       } catch (error) {
@@ -51,6 +51,7 @@ const uploadPromise = (req, res, next, userId) => {
 };
 
 const handleUpload = async (req, res, next) => {
+  console.log(req.params.id);
   try {
     await uploadPromise(req, res, next, req.params.id);
   } catch (error) {
