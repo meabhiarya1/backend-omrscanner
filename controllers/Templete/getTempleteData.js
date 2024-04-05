@@ -16,7 +16,6 @@ const getTempleteData = async (req, res, next) => {
     });
 
     if (!templete) {
-      // Handle case where the template with the given ID doesn't exist
       return res.status(404).json({ message: "Template not found" });
     }
 

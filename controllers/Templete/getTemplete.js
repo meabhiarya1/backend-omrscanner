@@ -12,12 +12,18 @@ const getTemplete = (req, res, next) => {
           },
         },
       ],
-    }).then((data) => {
-      // console.log(data.dataValues.templetedata)
-      res.status(200).json(data);
-    });
+    })
+      .then((data) => {
+        res.status(200).json(data);
+      })
+      .catch((error) => {
+        // Catch any errors that occur during the promise chain
+        console.error("Error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      });
   } catch (error) {
-    console.log(error);
+    console.error("Error:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 };
 
