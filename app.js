@@ -20,7 +20,7 @@ Templete.hasMany(Files);
 Files.belongsTo(Templete);
 
 sequelize
-  .sync({ force: true })
+  .sync({ force: false })
   .then(() => {
     console.log("Server is connected");
     app.listen(4000);

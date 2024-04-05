@@ -74,7 +74,7 @@ const uploadPromise = (req, res, next, id, imageColName) => {
             { SheetNames: [sheetName], Sheets: { [sheetName]: csvData } },
             filePath
           );
-          res.status(200).json(updatedJson);
+          res.status(200).json(filePath);
         } else {
           res.status(404).json({ error: "File not found" });
         }
@@ -91,7 +91,7 @@ const uploadPromise = (req, res, next, id, imageColName) => {
 const handleUpload = async (req, res, next) => {
   try {
     await uploadPromise(req, res, next, req.params.id, req.query.imageColName);
-    // return res.status(200).send("Files Uploaded successfully");
+    console.log("Files Uploaded successfully");
   } catch (error) {
     console.error("Error handling upload:", error);
     return res.status(500).send(error);
