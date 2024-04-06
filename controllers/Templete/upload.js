@@ -1,6 +1,5 @@
 const multer = require("multer");
 const XLSX = require("xlsx");
-const MetaData = require("../../models/TempleteModel/metadata");
 const Files = require("../../models/TempleteModel/files");
 const path = require("path");
 const fs = require("fs");
@@ -37,7 +36,7 @@ const uploadPromise = (req, res, next, id, imageColName) => {
       }
       try {
         // Update database with file names
-        await Files.create({
+        const createdFile = await Files.create({
           csvFile: req.files.csvFile[0].filename,
           zipFile: req.files.zipFile[0].filename,
           templeteId: id,
@@ -74,7 +73,7 @@ const uploadPromise = (req, res, next, id, imageColName) => {
             { SheetNames: [sheetName], Sheets: { [sheetName]: csvData } },
             filePath
           );
-          res.status(200).json(filePath);
+          res.status(200).json({ fileId: createdFile.id });
         } else {
           res.status(404).json({ error: "File not found" });
         }
