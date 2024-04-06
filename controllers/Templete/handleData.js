@@ -1,7 +1,7 @@
 const XLSX = require("xlsx");
 const fs = require("fs");
-const Files = require("../../models/TempleteModel/files");
 const path = require("path");
+const Files = require("../../models/TempleteModel/files");
 
 const handleData = async (req, res, next) => {
   const mappedData = req.body;
@@ -10,10 +10,10 @@ const handleData = async (req, res, next) => {
     if (!mappedData.fileId) {
       return res.status(400).json({ error: "File not provided" });
     }
+
     Files.findOne({ where: { id: mappedData.fileId } }).then((fileData) => {
       const filename = fileData.csvFile;
       const filePath = path.join(__dirname, "../../csvFile", filename);
-      // console.log(filePath);
 
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: "File not found" });
@@ -23,9 +23,34 @@ const handleData = async (req, res, next) => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
-      // console.log(data);
+
+      const newDataKeys = Object.keys(data[0]);
+      const newHeaders = Object.values(mappedData);
+
+      newHeaders.pop();
+      newHeaders.push("Images");
+  
+
+      if (newDataKeys.length !== newHeaders.length) {
+        return res.status(400).json({ error: "Mapped data headers mismatch" });
+      }
+
+      const mergedObject = newDataKeys.reduce((acc, key, index) => {
+        acc[key] = newHeaders[index];
+        return acc;
+      }, {});
+
+      data.unshift(mergedObject);
+      const csvData = XLSX.utils.json_to_sheet(data);
+
       fs.unlinkSync(filePath);
-      res.status(200).json(data);
+
+      XLSX.writeFile(
+        { SheetNames: [sheetName], Sheets: { [sheetName]: csvData } },
+        filePath
+      );
+
+      res.status(200).json({ message: "Header Added Successfully" });
     });
   } catch (error) {
     console.error("Error handling data:", error);
