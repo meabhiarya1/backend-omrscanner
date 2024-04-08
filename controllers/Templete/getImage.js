@@ -6,7 +6,7 @@ const AdmZip = require("adm-zip");
 const getImage = async (req, res, next) => {
   const fileId = req.params.id;
   const { image } = req.body;
-  //   console.log(image, id);
+  // console.log(image, fileId);
 
   try {
     if (!fileId || !image) {
@@ -16,12 +16,14 @@ const getImage = async (req, res, next) => {
     }
 
     const fileData = await Files.findOne({ where: { id: fileId } });
+
     if (!fileData) {
       return res.status(404).json({ error: "File not found" });
     }
 
     const filename = fileData.zipFile;
     const zipFilePath = path.join(__dirname, "../../zipFile", filename);
+    // console.log(zipFilePath);
 
     if (!fs.existsSync(zipFilePath)) {
       return res.status(404).json({ error: "Zip file not found" });
@@ -39,14 +41,9 @@ const getImage = async (req, res, next) => {
 
     const imageData = zip.readFile(matchingEntry);
     res.writeHead(200, {
-      "Content-Type": "image/tiff", // You may need to adjust the content type based on the image format
+      "Content-Type": "image/jpg", // You may need to adjust the content type based on the image format
       "Content-Length": imageData.length,
     });
-
-    // const imageDataBuffer = Buffer.from(imageData);
-    // const base64Image = imageDataBuffer.toString("base64");
-    // const dataUrl = `data:image/jpeg;base64,${base64Image}`;
-    // console.log(imageData);
 
     res.end(imageData);
   } catch (error) {

@@ -6,7 +6,11 @@ const templeteRoutes = require("./routes/templete");
 const Templete = require("./models/TempleteModel/templete");
 const MetaData = require("./models/TempleteModel/metadata");
 const Files = require("./models/TempleteModel/files");
+const path = require('path');
+
 const app = express();
+
+app.use("/static", express.static(path.join(__dirname, "/extractedFiles")));
 
 app.use(cors());
 app.use(bodyParser.json({ extended: false }));
@@ -20,7 +24,7 @@ Templete.hasMany(Files);
 Files.belongsTo(Templete);
 
 sequelize
-  .sync({ force: false})
+  .sync({ force: false })
   .then(() => {
     console.log("Server is connected");
     app.listen(4000);

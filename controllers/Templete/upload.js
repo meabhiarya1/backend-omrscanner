@@ -3,6 +3,7 @@ const XLSX = require("xlsx");
 const Files = require("../../models/TempleteModel/files");
 const path = require("path");
 const fs = require("fs");
+const AdmZip = require("adm-zip");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -28,7 +29,6 @@ const upload = multer({ storage: storage }).fields([
 const uploadPromise = (req, res, next, id, imageColName) => {
   console.log(imageColName);
   return new Promise((resolve, reject) => {
-    // console.log(userId);
     upload(req, res, async function (err) {
       if (err) {
         console.error("Error uploading files:", err);
@@ -41,47 +41,71 @@ const uploadPromise = (req, res, next, id, imageColName) => {
           zipFile: req.files.zipFile[0].filename,
           templeteId: id,
         });
+
         const filePath = path.join(
           __dirname,
           "../../csvFile",
           req.files.csvFile[0].filename
         );
-        // console.log(filePath);
-        if (fs.existsSync(filePath)) {
-          const workbook = XLSX.readFile(filePath);
-          const sheetName = workbook.SheetNames[0];
-          const worksheet = workbook.Sheets[sheetName];
-          // console.log(worksheet)
-          const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
 
-          const updatedJson = data.map((obj) => {
-            return obj;
-          });
+        const zipFilePath = path.join(
+          __dirname,
+          "../../zipFile",
+          req.files.zipFile[0].filename
+        );
 
-          const image = imageColName.replace('"', "'");
-          updatedJson.forEach((obj) => {
-            const imagePath = obj[image];
-            const parts = imagePath.split("\\");
-            const filename = parts[parts.length - 1];
-            obj[image] = filename;
-          });
-
-          // console.log(updatedJson)
-
-          //   // Convert JSON data back to CSV format
-          const csvData = XLSX.utils.json_to_sheet(updatedJson);
-
-          fs.unlinkSync(filePath);
-          XLSX.writeFile(
-            { SheetNames: [sheetName], Sheets: { [sheetName]: csvData } },
-            filePath
+        if (fs.existsSync(zipFilePath)) {
+          const destinationFolderPath = path.join(
+            __dirname,
+            "../../extractedFiles",
+            req.files.zipFile[0].filename.replace(".zip", "")
           );
-          res.status(200).json({ fileId: createdFile.id });
+
+          // Create a folder for extracted files
+          fs.mkdirSync(destinationFolderPath);
+
+          // Extract contents of the zip file
+          const zip = new AdmZip(zipFilePath);
+          zip.extractAllTo(destinationFolderPath, true);
+
+          // Process CSV file
+          if (fs.existsSync(filePath)) {
+            const workbook = XLSX.readFile(filePath);
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+            const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
+
+            const updatedJson = data.map((obj) => {
+              return obj;
+            });
+
+            const image = imageColName.replace('"', "'");
+            updatedJson.forEach((obj) => {
+              const imagePath = obj[image];
+              const parts = imagePath.split("\\");
+              const filename = parts[parts.length - 1];
+              obj[image] = `${req.files.zipFile[0].filename.replace(
+                ".zip",
+                ""
+              )}` + `${filename}`;
+            });
+
+            const csvData = XLSX.utils.json_to_sheet(updatedJson);
+
+            fs.unlinkSync(filePath);
+            XLSX.writeFile(
+              { SheetNames: [sheetName], Sheets: { [sheetName]: csvData } },
+              filePath
+            );
+            res.status(200).json({ fileId: createdFile.id });
+            console.log("File Uploaded Successfully");
+            resolve("File Uploaded Successfully");
+          } else {
+            res.status(404).json({ error: "CSV File not found" });
+          }
         } else {
-          res.status(404).json({ error: "File not found" });
+          res.status(404).json({ error: "Zip file not found" });
         }
-        console.log("File Uploaded Successfully");
-        resolve("File Uploaded Successfully");
       } catch (error) {
         console.error("Error updating database:", error);
         reject("Error updating database");
