@@ -51,7 +51,7 @@ const handleData = async (req, res, next) => {
         filePath
       );
 
-      res.status(200).json({ message: "Header Added Successfully" });
+      res.status(200).json({ fileId: mappedData.fileId });
     });
   } catch (error) {
     console.error("Error handling data:", error);

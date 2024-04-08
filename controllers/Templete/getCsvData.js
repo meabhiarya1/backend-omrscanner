@@ -5,13 +5,11 @@ const Files = require("../../models/TempleteModel/files");
 
 
 const getCsvData = async (req, res, next) => {
-  const mappedData = req.body;
-  console.log(mappedData);
   try {
-    if (!mappedData.fileId) {
+    if (!req.params.id) {
       return res.status(400).json({ error: "File not provided" });
     }
-    Files.findOne({ where: { id: mappedData.fileId } }).then((fileData) => {
+    Files.findOne({ where: { id: req.params.id } }).then((fileData) => {
       const filename = fileData.csvFile;
       const filePath = path.join(__dirname, "../../csvFile", filename);
       // console.log(filePath);

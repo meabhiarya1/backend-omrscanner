@@ -10,12 +10,12 @@ const getCsvData = require("../controllers/Templete/getCsvData");
 const router = express.Router();
 
 router.get("/get/templetes", getTemplete);
-router.get("/get/templetedata/:id", getTempleteData);
-router.get("/get/headerdata/:id", getHeaderData);
-router.get("/get/csvdata", getCsvData);
+router.get("/get/templetedata/:id", getTempleteData); //templeteId
+router.get("/get/headerdata/:id", getHeaderData); //templeteId
+router.get("/get/csvdata/:id", getCsvData); // fileId
 
 router.post("/add/templete", addTemplete);
-router.post("/upload/:id", handleUpload);
-router.post("/data", handleData);
+router.post("/upload/:id", handleUpload); //templeteId
+router.post("/data", handleData); 
 
 module.exports = router;
