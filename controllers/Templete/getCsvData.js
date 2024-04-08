@@ -3,16 +3,18 @@ const fs = require("fs");
 const path = require("path");
 const Files = require("../../models/TempleteModel/files");
 
-
 const getCsvData = async (req, res, next) => {
   try {
     if (!req.params.id) {
       return res.status(400).json({ error: "File not provided" });
     }
     Files.findOne({ where: { id: req.params.id } }).then((fileData) => {
+      if (!fileData) {
+        return res.status(404).json({ error: "File not found" });
+      }
+
       const filename = fileData.csvFile;
       const filePath = path.join(__dirname, "../../csvFile", filename);
-      // console.log(filePath);
 
       if (!fs.existsSync(filePath)) {
         return res.status(404).json({ error: "File not found" });
@@ -22,8 +24,9 @@ const getCsvData = async (req, res, next) => {
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
-      // console.log(data);
+
       fs.unlinkSync(filePath);
+
       res.status(200).json(data);
     });
   } catch (error) {
