@@ -46,7 +46,7 @@ const uploadPromise = (req, res, next, id, imageColName) => {
           "../../csvFile",
           req.files.csvFile[0].filename
         );
-        console.log(filePath);
+        // console.log(filePath);
         if (fs.existsSync(filePath)) {
           const workbook = XLSX.readFile(filePath);
           const sheetName = workbook.SheetNames[0];
@@ -57,13 +57,16 @@ const uploadPromise = (req, res, next, id, imageColName) => {
           const updatedJson = data.map((obj) => {
             return obj;
           });
-          // console.log(updatedJson)
+
+          const image = imageColName.replace('"', "'");
           updatedJson.forEach((obj) => {
-            const imagePath = obj["Page 1 Image"];
+            const imagePath = obj[image];
             const parts = imagePath.split("\\");
             const filename = parts[parts.length - 1];
-            obj["Page 1 Image"] = filename;
+            obj[image] = filename;
           });
+
+          // console.log(updatedJson)
 
           //   // Convert JSON data back to CSV format
           const csvData = XLSX.utils.json_to_sheet(updatedJson);

@@ -5,7 +5,7 @@ const Files = require("../../models/TempleteModel/files");
 
 const handleData = async (req, res, next) => {
   const mappedData = req.body;
-  console.log(mappedData);
+  // console.log(mappedData);
   try {
     if (!mappedData.fileId) {
       return res.status(400).json({ error: "File not provided" });
@@ -13,6 +13,7 @@ const handleData = async (req, res, next) => {
 
     Files.findOne({ where: { id: mappedData.fileId } }).then((fileData) => {
       const filename = fileData.csvFile;
+      // console.log(filename);
       const filePath = path.join(__dirname, "../../csvFile", filename);
 
       if (!fs.existsSync(filePath)) {
@@ -28,8 +29,8 @@ const handleData = async (req, res, next) => {
       const newHeaders = Object.values(mappedData);
 
       newHeaders.pop();
-      newHeaders.push("Images");
-  
+      // console.log(newDataKeys);
+      // console.log(newHeaders);
 
       if (newDataKeys.length !== newHeaders.length) {
         return res.status(400).json({ error: "Mapped data headers mismatch" });
