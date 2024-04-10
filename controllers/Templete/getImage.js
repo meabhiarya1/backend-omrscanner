@@ -1,54 +1,63 @@
 const fs = require("fs");
 const path = require("path");
-const Files = require("../../models/TempleteModel/files");
-const AdmZip = require("adm-zip");
+const Jimp = require("jimp");
+const MetaData = require("../../models/TempleteModel/metadata");
+const cropImage = require("../../services/sharpImageCropper");
 
 const getImage = async (req, res, next) => {
-  const fileId = req.params.id;
-  const { image } = req.body;
-  // console.log(image, fileId);
+  const { imageName, id } = req.body;
+  // console.log(imageName, id);
 
+  if (!imageName || !id) {
+    return res.status(500).json("Id or ImageName is Missing");
+  }
+
+  const sourceFilePath = path.join(
+    __dirname,
+    "..",
+    "..",
+    "extractedFiles",
+    imageName
+  );
+
+  if (!sourceFilePath) {
+    return res.status(500).json("File not Found");
+  }
+  
   try {
-    if (!fileId || !image) {
-      return res
-        .status(400)
-        .json({ error: "File ID or image name not provided" });
-    }
+    // Read the TIFF file
+    const image = await Jimp.read(sourceFilePath);
+    const bufferImage = await image.getBufferAsync(Jimp.MIME_JPEG);
+    const base64Image = bufferImage.toString("base64");
 
-    const fileData = await Files.findOne({ where: { id: fileId } });
-
-    if (!fileData) {
-      return res.status(404).json({ error: "File not found" });
-    }
-
-    const filename = fileData.zipFile;
-    const zipFilePath = path.join(__dirname, "../../zipFile", filename);
-    // console.log(zipFilePath);
-
-    if (!fs.existsSync(zipFilePath)) {
-      return res.status(404).json({ error: "Zip file not found" });
-    }
-
-    const zip = new AdmZip(zipFilePath);
-    const zipEntries = zip.getEntries();
-    const matchingEntry = zipEntries.find((entry) =>
-      entry.entryName.includes(image)
-    );
-
-    if (!matchingEntry) {
-      return res.status(404).json({ error: "Image not found in the zip file" });
-    }
-
-    const imageData = zip.readFile(matchingEntry);
-    res.writeHead(200, {
-      "Content-Type": "image/jpg", // You may need to adjust the content type based on the image format
-      "Content-Length": imageData.length,
+    const data = await MetaData.findAll({
+      where: { templeteId: id },
     });
+    if (data.length === 0) {
+      return res.status(500).json("Id is Incorrect");
+    }
+    const allImages = await Promise.all(
+      data.map(async (item, index) => {
+        const { attribute, coordinateX, coordinateY, width, height } =
+          item.dataValues;
 
-    res.end(imageData);
-  } catch (error) {
-    console.error("Error handling data:", error);
-    res.status(500).json({ error: "Internal server error" });
+        const coordinates = {
+          x: Math.ceil(coordinateX),
+          y: Math.ceil(coordinateY),
+          width: Math.ceil(width),
+          height: Math.ceil(height),
+        };
+
+        const imageUrl = await cropImage(base64Image, coordinates);
+        return { attribute, imageUrl };
+      })
+    );
+    // Send the buffer image as a response
+    res.status(200).json({ base64Image, croppedImages: allImages });
+  } catch (err) {
+    // Handle errors
+    console.error("Error converting image:", err);
+    res.status(500).send("Error converting image.");
   }
 };
 

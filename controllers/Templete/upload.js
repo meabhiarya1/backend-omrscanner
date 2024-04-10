@@ -27,7 +27,7 @@ const upload = multer({ storage: storage }).fields([
 ]);
 
 const uploadPromise = (req, res, next, id, imageColName) => {
-  console.log(imageColName);
+  // console.log(imageColName);
   return new Promise((resolve, reject) => {
     upload(req, res, async function (err) {
       if (err) {
@@ -79,15 +79,16 @@ const uploadPromise = (req, res, next, id, imageColName) => {
               return obj;
             });
 
-            const image = imageColName.replace('"', "'");
+            const image = imageColName.replaceAll('"', "");
             updatedJson.forEach((obj) => {
               const imagePath = obj[image];
-              const parts = imagePath.split("\\");
-              const filename = parts[parts.length - 1];
-              obj[image] = `${req.files.zipFile[0].filename.replace(
-                ".zip",
-                ""
-              )}` + `${filename}`;
+              const index = imagePath.indexOf("\\HINDI");
+              const filename = imagePath.substring(index);
+              // console.log(filename);
+
+              obj[image] =
+                `${req.files.zipFile[0].filename.replace(".zip", "")}` +
+                `${filename}`;
             });
 
             const csvData = XLSX.utils.json_to_sheet(updatedJson);

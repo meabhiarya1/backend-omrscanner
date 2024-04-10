@@ -5,7 +5,7 @@ const Files = require("../../models/TempleteModel/files");
 
 const handleData = async (req, res, next) => {
   const mappedData = req.body;
-  // console.log(mappedData);
+  console.log(mappedData);
   try {
     if (!mappedData.fileId) {
       return res.status(400).json({ error: "File not provided" });
@@ -42,8 +42,9 @@ const handleData = async (req, res, next) => {
       }, {});
 
       data.unshift(mergedObject);
+      // console.log(data)
       const csvData = XLSX.utils.json_to_sheet(data);
-
+      // console.log(filePath);
       fs.unlinkSync(filePath);
 
       XLSX.writeFile(

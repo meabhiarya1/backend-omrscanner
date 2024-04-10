@@ -4,7 +4,7 @@ const path = require("path");
 const Files = require("../../models/TempleteModel/files");
 
 const getCsvData = async (req, res, next) => {
-  // console.log(req.params.id)
+  console.log(req.params.id)
   try {
     if (!req.params.id) {
       return res.status(400).json({ error: "File not provided" });
@@ -28,8 +28,8 @@ const getCsvData = async (req, res, next) => {
       const worksheet = workbook.Sheets[sheetName];
       const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
 
-      fs.unlinkSync(filePath);
-
+      // fs.unlinkSync(filePath);
+      // console.log(data)
       res.status(200).json(data);
     });
   } catch (error) {
