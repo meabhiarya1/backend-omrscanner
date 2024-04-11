@@ -22,7 +22,7 @@ const getImage = async (req, res, next) => {
 
     // Read the TIFF file
     const image = await Jimp.read(sourceFilePath);
-    const bufferImage = await image.getBufferAsync(Jimp.MIME_JPEG);
+    const bufferImage = await image.getBufferAsync(Jimp.MIME_PNG);
     const base64Image = bufferImage.toString("base64");
 
     const data = await MetaData.findAll({ where: { templeteId: id } });

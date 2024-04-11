@@ -45,7 +45,12 @@ const handleData = async (req, res, next) => {
         return acc;
       }, {});
 
-      data.unshift(mergedObject);
+   
+
+      if (JSON.stringify(data[0]) !== JSON.stringify(mergedObject)) {
+        data.unshift(mergedObject);
+      }
+
       // console.log(data)
       const csvData = XLSX.utils.json_to_sheet(data);
       // console.log(filePath);

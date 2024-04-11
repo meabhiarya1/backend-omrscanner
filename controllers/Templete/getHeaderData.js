@@ -7,7 +7,7 @@ const getHeaderData = (req, res, next) => {
   // console.log(req.params.id);
   try {
     Files.findOne({ where: { templeteId: req.params.id } }).then((fileData) => {
-      // console.log(fileData);
+      console.log(fileData);
       if (!fileData) {
         return res.status(404).json({ error: "File not found" });
       }
@@ -19,7 +19,6 @@ const getHeaderData = (req, res, next) => {
 
       if (fs.existsSync(filePath)) {
         const workbook = XLSX.readFile(filePath);
-
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
@@ -30,7 +29,7 @@ const getHeaderData = (req, res, next) => {
         }
         res.status(200).json(Object.keys(data[0]));
       } else {
-        res.status(404).json({ error: "File not found 1111111111111" });
+        res.status(404).json({ error: "File not found on given filepath" });
       }
     });
   } catch (error) {

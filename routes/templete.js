@@ -18,6 +18,6 @@ router.get("/get/csvdata/:id", getCsvData); // fileId
 router.post("/get/image", getImage);
 router.post("/add/templete", addTemplete);
 router.post("/upload/:id", handleUpload); //templeteId
-router.post("/data", handleData);
+router.post("/data", handleData); 
 
 module.exports = router;
