@@ -12,6 +12,9 @@ const handleData = async (req, res, next) => {
     }
 
     Files.findOne({ where: { id: mappedData.fileId } }).then((fileData) => {
+      if (!fs.existsSync(fileData.csvFile)) {
+        return res.status(404).json({ error: "File not exists" });
+      }
       const filename = fileData.csvFile;
       // console.log(filename);
       const filePath = path.join(__dirname, "../../csvFile", filename);
