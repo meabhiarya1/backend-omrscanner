@@ -36,16 +36,15 @@ const handleData = async (req, res, next) => {
       // console.log(newDataKeys);
       // console.log(newHeaders);
 
-      if (newDataKeys.length !== newHeaders.length) {
-        return res.status(400).json({ error: "Mapped data headers mismatch" });
-      }
+      // if (newDataKeys.length !== newHeaders.length) {
+      //   return res.status(400).json({ error: "Mapped data headers mismatch" });
+      // }
 
       const mergedObject = newDataKeys.reduce((acc, key, index) => {
         acc[key] = newHeaders[index];
         return acc;
       }, {});
 
-   
 
       if (JSON.stringify(data[0]) !== JSON.stringify(mergedObject)) {
         data.unshift(mergedObject);

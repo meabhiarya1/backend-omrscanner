@@ -4,6 +4,7 @@ const Files = require("../../models/TempleteModel/files");
 const path = require("path");
 const fs = require("fs");
 const AdmZip = require("adm-zip");
+const getAllDirectories = require("../../services/directoryFinder");
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -62,15 +63,22 @@ const uploadPromise = (req, res, next, id, imageColName) => {
           );
 
           // Create a folder for extracted files
-          fs.mkdirSync(destinationFolderPath);
+          fs.mkdirSync(destinationFolderPath); //Blocking operation // sync task
 
           // Extract contents of the zip file
           const zip = new AdmZip(zipFilePath);
           zip.extractAllTo(destinationFolderPath, true);
 
+          const allDirectories = getAllDirectories(destinationFolderPath);
+          // console.log("All directories:", allDirectories);
+          const pathDir =
+            req.files.zipFile[0].filename.replace(".zip", "") +
+            "/" +
+            allDirectories.join("/");
+
           // Process CSV file
           if (fs.existsSync(filePath)) {
-            const workbook = XLSX.readFile(filePath);
+            const workbook = XLSX.readFile(filePath); //Non Blocking operation // async task
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
             const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
@@ -82,13 +90,8 @@ const uploadPromise = (req, res, next, id, imageColName) => {
             const image = imageColName.replaceAll('"', "");
             updatedJson.forEach((obj) => {
               const imagePath = obj[image];
-              const index = imagePath.indexOf("\\HINDI");
-              const filename = imagePath.substring(index);
-              // console.log(filename);
-
-              obj[image] =
-                `${req.files.zipFile[0].filename.replace(".zip", "")}` +
-                `${filename}`;
+              const filename = path.basename(imagePath);
+              obj[image] = `${pathDir}/` + `${filename}`;
             });
 
             const csvData = XLSX.utils.json_to_sheet(updatedJson);
