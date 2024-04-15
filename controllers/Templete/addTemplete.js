@@ -22,6 +22,7 @@ const addTemplete = async (req, res, next) => {
           coordinateY: current.coordinateY,
           width: current.width,
           height: current.height,
+          fieldType: current.fieldType,
           templeteId: templeteResult.id,
         });
       })

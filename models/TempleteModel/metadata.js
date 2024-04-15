@@ -31,6 +31,11 @@ const MetaData = sequelize.define("templetedata", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+
+  fieldType: {
+    type: Sequelize.STRING,
+    allowNull: false,
+  },
 });
 
 module.exports = MetaData;
