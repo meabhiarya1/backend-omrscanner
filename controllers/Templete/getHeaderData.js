@@ -21,7 +21,7 @@ const getHeaderData = (req, res, next) => {
         const workbook = XLSX.readFile(filePath);
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        const data = XLSX.utils.sheet_to_json(worksheet, { raw: true });
+        const data = XLSX.utils.sheet_to_json(worksheet, { raw: true, defval: "BLANK" });
         if (data[0] == undefined || data[0] == null) {
           return res
             .status(404)

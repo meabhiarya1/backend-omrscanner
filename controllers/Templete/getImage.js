@@ -1,8 +1,5 @@
 const fs = require("fs").promises;
 const path = require("path");
-const Jimp = require("jimp");
-const MetaData = require("../../models/TempleteModel/metadata");
-const cropImage = require("../../services/sharpImageCropper");
 
 const getImage = async (req, res, next) => {
   try {
@@ -22,14 +19,21 @@ const getImage = async (req, res, next) => {
       imageName
     );
 
+    const sourceFileExists = await fs
+      .access(sourceFilePath)
+      .then(() => true)
+      .catch(() => false);
+
+    if (!sourceFileExists) {
+      return res.status(404).json({ error: "File not found" });
+    }
+
     // Check if source file exists
     // const sourceFileExists = await fs
     //   .access(sourceFilePath)
     //   .then(() => true)
     //   .catch(() => false);
-    // if (!sourceFileExists) {
-    //   return res.status(404).json({ error: "File not found" });
-    // }
+    //
 
     // Read the TIFF file
     // const image = await Jimp.read(sourceFilePath);
