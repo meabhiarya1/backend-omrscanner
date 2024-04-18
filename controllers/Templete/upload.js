@@ -27,20 +27,6 @@ const upload = multer({ storage: storage }).fields([
   { name: "zipFile" },
 ]);
 
-const replaceBlankCells = (data) => {
-  // Loop through each row in the data
-  data.forEach((row) => {
-    // Loop through each column in the row
-    Object.keys(row).forEach((key) => {
-      // If the cell value is empty or undefined, replace it with "BLANK"
-      if (row[key] === "" || row[key] === undefined) {
-        row[key] = "BLANK";
-      }
-    });
-  });
-  return data;
-};
-
 const uploadPromise = (req, res, next, id, imageColName) => {
   // console.log(imageColName);
   return new Promise((resolve, reject) => {
