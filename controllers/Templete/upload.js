@@ -13,6 +13,9 @@ const storage = multer.diskStorage({
     const destinationFolder = ext.includes(file.originalname.split(".").pop())
       ? "zipFile/"
       : "csvFile/";
+    if (!fs.existsSync(destinationFolder)) {
+      fs.mkdirSync(destinationFolder);
+    }
     cb(null, destinationFolder);
   },
   filename: function (req, file, cb) {
@@ -56,13 +59,20 @@ const uploadPromise = (req, res, next, id, imageColName) => {
         );
 
         if (fs.existsSync(zipFilePath)) {
+          const extractedFilesFolderPath = path.join(
+            __dirname,
+            "../../extractedFiles"
+          );
+          if (!fs.existsSync(extractedFilesFolderPath)) {
+            fs.mkdirSync(extractedFilesFolderPath);
+          }
           const destinationFolderPath = path.join(
             __dirname,
             "../../extractedFiles",
             req.files.zipFile[0].filename.replace(".zip", "")
           );
 
-          // Create a folder for extracted files
+          // Create a folder for zip file
           fs.mkdirSync(destinationFolderPath); //Blocking operation // sync task
 
           // Extract contents of the zip file
@@ -81,7 +91,9 @@ const uploadPromise = (req, res, next, id, imageColName) => {
             const workbook = XLSX.readFile(filePath); //Non Blocking operation // async task
             const sheetName = workbook.SheetNames[0];
             const worksheet = workbook.Sheets[sheetName];
-            const data = XLSX.utils.sheet_to_json(worksheet, { raw: true, defval: "BLANK" });
+            const data = XLSX.utils.sheet_to_json(worksheet, {
+              raw: true,
+            });
 
             const updatedJson = data.map((obj) => {
               return obj;
@@ -93,6 +105,8 @@ const uploadPromise = (req, res, next, id, imageColName) => {
               const filename = path.basename(imagePath);
               obj[image] = `${pathDir}/` + `${filename}`;
             });
+
+            // console.log(updatedJson)
 
             const csvData = XLSX.utils.json_to_sheet(updatedJson);
 
